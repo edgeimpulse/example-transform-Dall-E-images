@@ -1,4 +1,4 @@
-# Dall-E-Block
+# Dall-E Image Generation Block
  
 This is a transformation block that adds words or short sentences to your Edge Impulse project.
 
