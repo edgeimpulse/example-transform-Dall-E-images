@@ -16,16 +16,4 @@
     "type": "int",
     "help": "Number of unique images to generate",
     "param": "images"
-}, {
-    "name": "Number of variations",
-    "value": "0",
-    "type": "int",
-    "help": "How many times to call the Dall-E 'Variation' function to create similar variations of an image",
-    "param": "variations"
-}, {
-    "name": "Image size",
-    "value": "256x256",
-    "type": "string",
-    "help": "Output image size (e.g. 256x256)",
-    "param": "size"
 }]
