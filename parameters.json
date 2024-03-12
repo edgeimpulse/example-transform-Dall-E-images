@@ -1,0 +1,31 @@
+[{
+    "name": "Prompt",
+    "value": "A photo of a dog wearing a hat",
+    "type": "string",
+    "help": "The Dall-E prompt to generate images from",
+    "param": "prompt"
+},{
+    "name": "Label",
+    "value": "dog_with_hat",
+    "type": "string",
+    "help": "Images will be added to Edge Impulse with this label",
+    "param": "label"
+}, {
+    "name": "Number of images",
+    "value": "3",
+    "type": "int",
+    "help": "Number of unique images to generate",
+    "param": "images"
+}, {
+    "name": "Number of variations",
+    "value": "0",
+    "type": "int",
+    "help": "How many times to call the Dall-E 'Variation' function to create similar variations of an image",
+    "param": "variations"
+}, {
+    "name": "Image size",
+    "value": "256x256",
+    "type": "string",
+    "help": "Output image size (e.g. 256x256)",
+    "param": "size"
+}]
