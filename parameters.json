@@ -1,4 +1,10 @@
 [{
+    "name": "OpenAI API Key",
+    "value": "",
+    "type": "secret",
+    "help": "An API Key that gives access to OpenAI",
+    "param": "OPENAI_API_KEY"
+}, {
     "name": "Prompt",
     "value": "A photo of a dog wearing a hat",
     "type": "string",

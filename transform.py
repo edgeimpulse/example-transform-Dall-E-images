@@ -15,6 +15,7 @@ if not os.getenv('EI_PROJECT_API_KEY'):
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 API_KEY = os.environ.get("EI_PROJECT_API_KEY")
+INGESTION_HOST = os.environ.get("EI_INGESTION_HOST", "edgeimpulse.com")
 
 # these are the three arguments that we get in
 parser = argparse.ArgumentParser(description='Use OpenAI Dall-E to generate an image dataset for classification from your prompt')
@@ -27,6 +28,12 @@ args, unknown = parser.parse_known_args()
 if not os.path.exists(args.out_directory):
     os.makedirs(args.out_directory)
 output_folder = args.out_directory
+
+INGESTION_URL = "https://ingestion." + INGESTION_HOST
+if (INGESTION_HOST.endswith('.test.edgeimpulse.com')):
+    INGESTION_URL = "http://ingestion." + INGESTION_HOST
+if (INGESTION_HOST == 'host.docker.internal'):
+    INGESTION_URL = "http://" + INGESTION_HOST + ":4810"
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
@@ -87,7 +94,7 @@ for file in os.listdir(output_folder):
     file_path = os.path.join(output_folder, file)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as file:
-            res = requests.post(url='https://ingestion.edgeimpulse.com/api/training/files',
+            res = requests.post(url=INGESTION_URL + '/api/training/files',
             headers={
             'x-label': label,
             'x-api-key': API_KEY,},
