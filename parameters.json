@@ -6,13 +6,13 @@
     "param": "OPENAI_API_KEY"
 }, {
     "name": "Prompt",
-    "value": "A photo of a dog wearing a hat",
+    "value": "A photo of a factory worker wearing a hard hat",
     "type": "string",
     "help": "The Dall-E prompt to generate images from",
     "param": "prompt"
 },{
     "name": "Label",
-    "value": "dog_with_hat",
+    "value": "hard_hat",
     "type": "string",
     "help": "Images will be added to Edge Impulse with this label",
     "param": "label"
@@ -22,4 +22,15 @@
     "type": "int",
     "help": "Number of unique images to generate",
     "param": "images"
+}, {
+    "name": "Upload to category",
+    "value": "split",
+    "type": "select",
+    "valid": [
+        { "label": "Split 80/20 between training and testing", "value": "split" },
+        { "label": "Training", "value": "training" },
+        { "label": "Testing", "value": "testing" }
+    ],
+    "help": "Data will be uploaded to this category in your project",
+    "param": "upload-category"
 }]
