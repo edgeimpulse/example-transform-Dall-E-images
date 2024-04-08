@@ -4,6 +4,8 @@ import requests
 import argparse
 import json
 from openai import OpenAI
+import time
+
 client = OpenAI()
 
 if not os.getenv('OPENAI_API_KEY'):
