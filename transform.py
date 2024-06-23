@@ -25,7 +25,8 @@ parser = argparse.ArgumentParser(description='Use OpenAI Dall-E to generate an i
 parser.add_argument('--prompt', type=str, required=True, help="Prompt to give Dall-E to generate the images")
 parser.add_argument('--label', type=str, required=True, help="Label for the images")
 parser.add_argument('--images', type=int, required=True, help="Number of images to generate")
-parser.add_argument('--upload-category', type=str, required=True, help="Which category to upload data to in Edge Impule", default='split')
+parser.add_argument('--upload-category', type=str, required=True, help="Which category to upload data to in Edge Impulse", default='split')
+parser.add_argument('--synthetic-data-job-id', type=int, required=False, help="If specified, sets the synthetic_data_job_id metadata key", default='split')
 parser.add_argument('--skip-upload', type=bool, required=False, help="Skip uploading to EI", default=False)
 parser.add_argument('--out-directory', type=str, required=False, help="Directory to save images to", default="output")
 args, unknown = parser.parse_known_args()
@@ -83,20 +84,25 @@ for i in range(base_images_number):
         if not args.skip_upload:
             with open(fullpath, 'r') as file:
                 res = requests.post(url=INGESTION_URL + '/api/' + upload_category + '/files',
-                headers={
-                    'x-label': label,
-                    'x-api-key': API_KEY,
-                },
-                files = { 'data': (os.path.basename(fullpath), open(fullpath, 'rb'), 'image/png') }
-            )
-            if (res.status_code != 200):
-                raise Exception('Failed to upload file to Edge Impulse (status_code=' + str(res.status_code) + '): ' + res.content.decode("utf-8"))
-            else:
-                body = json.loads(res.content.decode("utf-8"))
-                if (body['success'] != True):
-                    raise Exception('Failed to upload file to Edge Impulse: ' + body['error'])
-                if (body['files'][0]['success'] != True):
-                    raise Exception('Failed to upload file to Edge Impulse: ' + body['files'][0]['error'])
+                    headers={
+                        'x-label': label,
+                        'x-api-key': API_KEY,
+                        'x-metadata': json.dumps({
+                            'generated_by': 'dall-e-3',
+                            'prompt': prompt,
+                        }),
+                        'x-synthetic-data-job-id': args.synthetic_data_job_id,
+                    },
+                    files = { 'data': (os.path.basename(fullpath), file, 'image/png') }
+                )
+                if (res.status_code != 200):
+                    raise Exception('Failed to upload file to Edge Impulse (status_code=' + str(res.status_code) + '): ' + res.content.decode("utf-8"))
+                else:
+                    body = json.loads(res.content.decode("utf-8"))
+                    if (body['success'] != True):
+                        raise Exception('Failed to upload file to Edge Impulse: ' + body['error'])
+                    if (body['files'][0]['success'] != True):
+                        raise Exception('Failed to upload file to Edge Impulse: ' + body['files'][0]['error'])
 
         print(' OK')
 
