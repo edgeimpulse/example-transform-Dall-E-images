@@ -44,7 +44,9 @@ client = OpenAI(
     api_key=OPENAI_API_KEY,
 )
 
-prompt = args.prompt
+# the replacement looks weird; but if calling this from CLI like "--prompt 'test\nanother line'" we'll get this still escaped
+# (you could use $'test\nanotherline' but we won't do that in the Edge Impulse backend)
+prompt = args.prompt.replace('\\n', '\n')
 label = args.label
 base_images_number = args.images
 upload_category = args.upload_category
