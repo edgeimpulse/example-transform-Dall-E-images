@@ -1,10 +1,10 @@
-# Imports
 import os, sys, shutil
 import requests
 import argparse
 import json
 from openai import OpenAI
 import time
+import traceback
 
 client = OpenAI()
 
@@ -63,8 +63,10 @@ else:
 
 epoch = int(time.time())
 
+images_left = base_images_number
+
 for i in range(base_images_number):
-    print(f'Creating image {i+1} of {base_images_number} for {label}...', end='')
+    print(f'Creating image {i+1} of {base_images_number} for {label}...', end='', flush=True)
     try:
         response = client.images.generate(
             model="dall-e-3",
@@ -82,31 +84,31 @@ for i in range(base_images_number):
             f.write(png)
 
         if not args.skip_upload:
-            with open(fullpath, 'r') as file:
-                res = requests.post(url=INGESTION_URL + '/api/' + upload_category + '/files',
-                    headers={
-                        'x-label': label,
-                        'x-api-key': API_KEY,
-                        'x-metadata': json.dumps({
-                            'generated_by': 'dall-e-3',
-                            'prompt': prompt,
-                        }),
-                        'x-synthetic-data-job-id': args.synthetic_data_job_id,
-                    },
-                    files = { 'data': (os.path.basename(fullpath), file, 'image/png') }
-                )
-                if (res.status_code != 200):
-                    raise Exception('Failed to upload file to Edge Impulse (status_code=' + str(res.status_code) + '): ' + res.content.decode("utf-8"))
-                else:
-                    body = json.loads(res.content.decode("utf-8"))
-                    if (body['success'] != True):
-                        raise Exception('Failed to upload file to Edge Impulse: ' + body['error'])
-                    if (body['files'][0]['success'] != True):
-                        raise Exception('Failed to upload file to Edge Impulse: ' + body['files'][0]['error'])
+            res = requests.post(url=INGESTION_URL + '/api/' + upload_category + '/files',
+                headers={
+                    'x-label': label,
+                    'x-api-key': API_KEY,
+                    'x-metadata': json.dumps({
+                        'generated_by': 'dall-e-3',
+                        'prompt': prompt,
+                    }),
+                    'x-synthetic-data-job-id': str(args.synthetic_data_job_id) if args.synthetic_data_job_id is not None else None,
+                },
+                files = { 'data': (os.path.basename(fullpath), png, 'image/png') }
+            )
+            if (res.status_code != 200):
+                raise Exception('Failed to upload file to Edge Impulse (status_code=' + str(res.status_code) + '): ' + res.content.decode("utf-8"))
+            else:
+                body = json.loads(res.content.decode("utf-8"))
+                if (body['success'] != True):
+                    raise Exception('Failed to upload file to Edge Impulse: ' + body['error'])
+                if (body['files'][0]['success'] != True):
+                    raise Exception('Failed to upload file to Edge Impulse: ' + body['files'][0]['error'])
 
         print(' OK')
 
     except Exception as e:
         print('')
         print('Failed to complete DALL-E generation:', e)
+        print(traceback.format_exc())
         exit(1)

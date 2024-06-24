@@ -8,4 +8,4 @@ RUN pip3 --no-cache-dir install -r requirements.txt
 
 COPY . ./
 
-ENTRYPOINT [ "python3",  "transform.py" ]
+ENTRYPOINT [ "python3", "-u", "transform.py" ]
