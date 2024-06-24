@@ -9,8 +9,9 @@
     "value": "A photo of a factory worker wearing a hard hat",
     "type": "string",
     "help": "The Dall-E prompt to generate images from",
-    "param": "prompt"
-},{
+    "param": "prompt",
+    "multiline": true
+}, {
     "name": "Label",
     "value": "hard_hat",
     "type": "string",

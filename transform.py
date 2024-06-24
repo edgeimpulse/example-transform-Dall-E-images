@@ -63,7 +63,9 @@ else:
 
 epoch = int(time.time())
 
-images_left = base_images_number
+print('Prompt:', prompt)
+print('Number of images:', base_images_number)
+print('')
 
 for i in range(base_images_number):
     print(f'Creating image {i+1} of {base_images_number} for {label}...', end='', flush=True)
