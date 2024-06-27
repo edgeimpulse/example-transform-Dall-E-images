@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description='Use OpenAI Dall-E to generate an i
 parser.add_argument('--prompt', type=str, required=True, help="Prompt to give Dall-E to generate the images")
 parser.add_argument('--label', type=str, required=True, help="Label for the images")
 parser.add_argument('--images', type=int, required=True, help="Number of images to generate")
-parser.add_argument('--upload-category', type=str, required=True, help="Which category to upload data to in Edge Impulse", default='split')
+parser.add_argument('--upload-category', type=str, required=False, help="Which category to upload data to in Edge Impulse", default='split')
 parser.add_argument('--synthetic-data-job-id', type=int, required=False, help="If specified, sets the synthetic_data_job_id metadata key")
 parser.add_argument('--skip-upload', type=bool, required=False, help="Skip uploading to EI", default=False)
 parser.add_argument('--out-directory', type=str, required=False, help="Directory to save images to", default="output")
