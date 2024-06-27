@@ -49,7 +49,7 @@ You can modify this repository and push it as a new custom Synthetic Data transf
     2. choose **Custom blocks > Transformation**, find your new block, click the three dots, and select *Edit transformation block*.
     3. Enable 'Show in Synthetic data':
 
-        ![Show in synthetic data](images/synthetic-data.png)
+        ![Show in synthetic data](images/show-in-synthetic-data.png)
 
     4. Save the block.
 
