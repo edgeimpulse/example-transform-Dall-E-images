@@ -1,9 +1,57 @@
 [{
+    "name": "Service",
+    "value": "openai",
+    "type": "select",
+    "help": "Which API service to use?",
+    "valid": [
+        { "label": "OpenAI", "value": "openai" },
+        { "label": "Azure OpenAI", "value": "azure" }
+    ],
+    "param": "service"
+}, {
     "name": "OpenAI API Key",
     "value": "",
     "type": "secret",
     "help": "An API Key that gives access to OpenAI",
-    "param": "OPENAI_API_KEY"
+    "param": "OPENAI_API_KEY",
+    "showIf": {
+        "parameter": "service",
+        "operator": "eq",
+        "value": "openai"
+    }
+}, {
+    "name": "Azure OpenAI API Key",
+    "value": "",
+    "type": "secret",
+    "help": "An API Key that gives access to Azure OpenAI",
+    "param": "AZURE_OPENAI_API_KEY",
+    "showIf": {
+        "parameter": "service",
+        "operator": "eq",
+        "value": "azure"
+    }
+}, {
+    "name": "Azure OpenAI Endpoint",
+    "value": "",
+    "type": "string",
+    "help": "E.g. 'https://XXX.openai.azure.com/'. Find it via your Azure OpenAI resource > Resource management > Keys and Endpoints",
+    "param": "azure-endpoint",
+    "showIf": {
+        "parameter": "service",
+        "operator": "eq",
+        "value": "azure"
+    }
+}, {
+    "name": "Azure OpenAI Deployment",
+    "value": "",
+    "type": "string",
+    "help": "Create one via: Azure OpenAI Studio > Deployments",
+    "param": "azure-deployment",
+    "showIf": {
+        "parameter": "service",
+        "operator": "eq",
+        "value": "azure"
+    }
 }, {
     "name": "Prompt",
     "value": "A photo of a factory worker wearing a hard hat",

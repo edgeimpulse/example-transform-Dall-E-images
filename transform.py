@@ -3,25 +3,20 @@ import requests
 import argparse
 import json
 from openai import OpenAI
+from openai import AzureOpenAI
 import time
 import traceback
-
-client = OpenAI()
-
-if not os.getenv('OPENAI_API_KEY'):
-    print('Missing OPENAI_API_KEY')
-    sys.exit(1)
 
 if not os.getenv('EI_PROJECT_API_KEY'):
     print('Missing EI_PROJECT_API_KEY')
     sys.exit(1)
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 API_KEY = os.environ.get("EI_PROJECT_API_KEY")
 INGESTION_HOST = os.environ.get("EI_INGESTION_HOST", "edgeimpulse.com")
 
 # these are the three arguments that we get in
 parser = argparse.ArgumentParser(description='Use OpenAI Dall-E to generate an image dataset for classification from your prompt')
+parser.add_argument('--service', type=str, required=False, help="Either \"openai\" or \"azure\"", default="openai")
 parser.add_argument('--prompt', type=str, required=True, help="Prompt to give Dall-E to generate the images")
 parser.add_argument('--label', type=str, required=True, help="Label for the images")
 parser.add_argument('--images', type=int, required=True, help="Number of images to generate")
@@ -29,6 +24,8 @@ parser.add_argument('--upload-category', type=str, required=False, help="Which c
 parser.add_argument('--synthetic-data-job-id', type=int, required=False, help="If specified, sets the synthetic_data_job_id metadata key")
 parser.add_argument('--skip-upload', type=bool, required=False, help="Skip uploading to EI", default=False)
 parser.add_argument('--out-directory', type=str, required=False, help="Directory to save images to", default="output")
+parser.add_argument('--azure-endpoint', type=str, required=False, help="E.g. 'https://XXX.openai.azure.com/', required if service is \"azure\"")
+parser.add_argument('--azure-deployment', type=str, required=False, help="Model deployment name from Azure OpenAI Studio, required if service is \"azure\"")
 args, unknown = parser.parse_known_args()
 if not os.path.exists(args.out_directory):
     os.makedirs(args.out_directory)
@@ -40,16 +37,42 @@ if (INGESTION_HOST.endswith('.test.edgeimpulse.com')):
 if (INGESTION_HOST == 'host.docker.internal'):
     INGESTION_URL = "http://" + INGESTION_HOST + ":4810"
 
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
-)
-
 # the replacement looks weird; but if calling this from CLI like "--prompt 'test\nanother line'" we'll get this still escaped
 # (you could use $'test\nanotherline' but we won't do that in the Edge Impulse backend)
 prompt = args.prompt.replace('\\n', '\n')
 label = args.label
 base_images_number = args.images
 upload_category = args.upload_category
+service = args.service
+
+if (service == 'openai'):
+    if not os.getenv('OPENAI_API_KEY'):
+        print('Missing OPENAI_API_KEY')
+        sys.exit(1)
+
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+    )
+elif (service == 'azure'):
+    if not os.getenv('AZURE_OPENAI_API_KEY'):
+        print('Missing AZURE_OPENAI_API_KEY')
+        sys.exit(1)
+    if not args.azure_endpoint:
+        print('Missing --azure-endpoint')
+        sys.exit(1)
+    if not args.azure_deployment:
+        print('Missing --azure-deployment')
+        sys.exit(1)
+
+    client = AzureOpenAI(
+        api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+        api_version='2024-02-01',
+        azure_endpoint=args.azure_endpoint,
+        azure_deployment=args.azure_deployment,
+    )
+else:
+    print('--service is invalid, should be "azure" or "openai" - but was "' + service + '"')
+    sys.exit(1)
 
 if (upload_category != 'split' and upload_category != 'training' and upload_category != 'testing'):
     print('Invalid value for "--upload-category", should be "split", "training" or "testing" (was: "' + upload_category + '")')
